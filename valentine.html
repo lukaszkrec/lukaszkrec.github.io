@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Valentine?</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, hotpink, red, pink);
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+            animation: wobble 6s infinite alternate;
+        }
+
+        @keyframes wobble {
+            0% {
+                filter: hue-rotate(0deg);
+            }
+            100% {
+                filter: hue-rotate(40deg);
+            }
+        }
+
+        .card-stack {
+            position: relative;
+            width: 90vw;
+            max-width: 420px;
+            height: 440px;
+        }
+
+        .card {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            border: 6px dashed hotpink;
+            border-radius: 30px;
+            padding: 30px 20px 40px;
+            text-align: center;
+            box-shadow: 0 20px 0 rgba(0, 0, 0, 0.15);
+            transform: rotate(-2deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .card.hidden {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            margin-bottom: 30px;
+            color: crimson;
+            text-shadow: 2px 2px 0 pink;
+        }
+
+        .hint {
+            font-size: 1rem;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+
+        .buttons {
+            position: relative;
+            height: 140px;
+            margin-top: auto;
+        }
+
+        button {
+            font-size: 1.1rem;
+            padding: 12px 26px;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            position: absolute;
+            transition: transform 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        #yes {
+            background: hotpink;
+            color: white;
+            left: 10px;
+            bottom: 0;
+            box-shadow: 0 6px 0 deeppink;
+        }
+
+        #yes:hover {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        #no {
+            background: lightgray;
+            color: #333;
+            right: 10px;
+            bottom: 0;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .heart {
+            position: fixed;
+            font-size: 24px;
+            animation: floatUp 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120px) scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            flex-direction: column;
+            padding: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .overlay img {
+            width: 90vw;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            object-position: center -20%;
+            border-radius: 50%;
+            display: block;
+            box-shadow: 0 0 40px hotpink;
+        }
+
+        .overlay h2 {
+            margin-top: 20px;
+            color: pink;
+            font-size: clamp(1.4rem, 5vw, 2rem);
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-stack">
+
+    <div class="card" id="card1">
+        <h1>I have a really important question for you 👀</h1>
+        <div class="hint">👉 Swipe left or right</div>
+    </div>
+
+    <div class="card hidden" id="card2" style="justify-content:flex-start; padding-top:40px;">
+        <h1>Do you want to be my Valentine? 💘</h1>
+
+        <div class="buttons">
+            <button id="yes">YES 💖</button>
+            <button id="no">NO 🙃</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="overlay" id="loveOverlay">
+    <img src="heartdesign.png" alt="Love"/>
+    <h2>YEAH!!! Love you so much babe 💖</h2>
+</div>
+
+<script>
+    const card1 = document.getElementById('card1');
+    const card2 = document.getElementById('card2');
+    const noBtn = document.getElementById('no');
+    const yesBtn = document.getElementById('yes');
+    const overlay = document.getElementById('loveOverlay');
+
+    let startX = 0;
+
+    function showSecondCard() {
+        card1.style.transform = 'translateX(-120%) rotate(-15deg)';
+        card1.style.opacity = '0';
+        card2.classList.remove('hidden');
+    }
+
+    card1.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    card1.addEventListener('touchend', e => {
+        if (Math.abs(e.changedTouches[0].clientX - startX) > 60) showSecondCard();
+    });
+    card1.addEventListener('mousedown', e => startX = e.clientX);
+    card1.addEventListener('mouseup', e => {
+        if (Math.abs(e.clientX - startX) > 60) showSecondCard();
+    });
+
+    function moveNoButton() {
+        const x = Math.random() * 200 - 100;
+        const y = Math.random() * 100 - 50;
+        noBtn.style.transform = `translate(${x}px, ${y}px) rotate(${Math.random() * 20 - 10}deg)`;
+    }
+
+    noBtn.addEventListener('mouseover', moveNoButton);
+    noBtn.addEventListener('touchstart', moveNoButton);
+
+    yesBtn.addEventListener('click', () => {
+        createHearts();
+        setTimeout(() => overlay.style.display = 'flex', 600);
+    });
+
+    function createHearts() {
+        for (let i = 0; i < 18; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = '💖';
+            heart.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px';
+            heart.style.top = (window.innerHeight / 2 + Math.random() * 60) + 'px';
+            heart.style.animationDuration = 1 + Math.random() * 0.8 + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1600);
+        }
+    }
+</script>
+</body>
+</html>
