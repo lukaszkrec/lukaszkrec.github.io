@@ -235,6 +235,12 @@
         setTimeout(() => overlay.style.display = 'flex', 600);
     });
 
+    yesBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        createHearts();
+        setTimeout(() => overlay.style.display = 'flex', 600);
+    });
+
     function createHearts() {
         for (let i = 0; i < 18; i++) {
             const heart = document.createElement('div');
